@@ -23,5 +23,5 @@ to run windows on background, add following to your hyprland.conf:
     }
    ```
 
-the window also must be opened somewhere.<br />
+the window also must be opened somewhere.<br>
 it could be a special workspace or some workspace 99 
