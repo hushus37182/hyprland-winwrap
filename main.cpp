@@ -1,15 +1,15 @@
-#include <hyprland/src/plugins/PluginAPI.hpp>
-#include <hyprland/src/event/EventBus.hpp> 
-#include <hyprland/src/Compositor.hpp>
-#include <hyprland/src/render/Renderer.hpp> 
-#include <hyprland/src/render/pass/PassElement.hpp>
-#include <hyprland/src/render/OpenGL.hpp>
-#include <hyprland/src/desktop/state/FocusState.hpp> 
-#include <hyprland/src/desktop/view/Window.hpp>
-#include <hyprland/src/protocols/XWaylandShell.hpp>
-#include <hyprland/src/protocols/XDGShell.hpp>  
-#include <hyprland/src/xwayland/XSurface.hpp>  
-#include <hyprland/src/desktop/DesktopTypes.hpp> 
+#include </home/hus/plugin/Hyprland/src/plugins/PluginAPI.hpp>
+#include </home/hus/plugin/Hyprland/src/event/EventBus.hpp> 
+#include </home/hus/plugin/Hyprland/src/Compositor.hpp>
+#include </home/hus/plugin/Hyprland/src/render/Renderer.hpp> 
+#include </home/hus/plugin/Hyprland/src/render/pass/PassElement.hpp>
+#include </home/hus/plugin/Hyprland/src/render/OpenGL.hpp>
+#include </home/hus/plugin/Hyprland/src/desktop/state/FocusState.hpp> 
+#include </home/hus/plugin/Hyprland/src/desktop/view/Window.hpp>
+#include </home/hus/plugin/Hyprland/src/protocols/XWaylandShell.hpp>
+#include </home/hus/plugin/Hyprland/src/protocols/XDGShell.hpp>  
+#include </home/hus/plugin/Hyprland/src/xwayland/XSurface.hpp>  
+#include </home/hus/plugin/Hyprland/src/desktop/DesktopTypes.hpp> 
 #include <thread>
 #include <chrono>
 #include <unistd.h>
@@ -64,10 +64,12 @@ public:
 
             CHyprOpenGLImpl::STextureRenderData texRenderData;
             texRenderData.a = 1.0f;
+            // texRenderData.blur = true;
+            // texRenderData.blockBlurOptimization = true;
             g_pHyprOpenGL->renderTexture(pWindowTexture, data.logicalBox, texRenderData);
-
+            g_pHyprOpenGL->markBlurDirtyForMonitor(pMonitor);
         } catch (...) {
-            HyprlandAPI::addNotification(PHANDLE, "Hyprland-winwrap: Fatal Error", CHyprColor{1.0, 0.0, 0.0, 1.0}, 5000);
+            HyprlandAPI::addNotification(PHANDLE, "[Hyprland-winwrap] Fatal Error", CHyprColor{1.0, 0.0, 0.0, 1.0}, 5000);
         }
     }
 
@@ -91,7 +93,9 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     const std::string CLIENT_HASH = __hyprland_api_get_client_hash();
     
     if (COMPOSITOR_HASH != CLIENT_HASH) {
-        throw std::runtime_error(CLIENT_HASH);
+        HyprlandAPI::addNotification(PHANDLE, "[Hyprland-winwrap] Mismatched headers! Can't proceed.",
+                                     CHyprColor{1.0, 0.2, 0.2, 1.0}, 5000);
+        throw std::runtime_error("[Hyprland-winwrap] Version mismatch");
     }
 
     HyprlandAPI::addConfigValue(PHANDLE, "plugin:hyprland-winwrap:class", Hyprlang::STRING{"kitty-bg"});
@@ -132,11 +136,11 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
             g_pHyprRenderer->m_renderPass.add(makeUnique<CProxyVideoElement>(proxyData));
 
         } catch (const exception& e) {
-            string errMsg = "Hyprland-winwrap: Fatal Error: ";
+            string errMsg = "[Hyprland-winwrap] Fatal Error: ";
             errMsg += e.what();
             HyprlandAPI::addNotification(PHANDLE, errMsg, CHyprColor{1.0, 0.0, 0.0, 1.0}, 5000);
         } catch (...) {
-            HyprlandAPI::addNotification(PHANDLE, "Hyprland-winwrap: Fatal Error", CHyprColor{1.0, 0.0, 0.0, 1.0}, 5000);
+            HyprlandAPI::addNotification(PHANDLE, "[Hyprland-winwrap] Fatal Error", CHyprColor{1.0, 0.0, 0.0, 1.0}, 5000);
         }
     });
 
